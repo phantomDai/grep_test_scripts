@@ -123,10 +123,7 @@ class mutant_failure_rate(object):
 
 if __name__ == '__main__':
     mutant_rate = mutant_failure_rate()
-    alist = ["grep_v1"]
-    all_mutants = [["grep_v1"],["grep_v2"],["grep_v3"],["grep_v4"],["grep_v5"],["grep_v6"],["grep_v7"],["grep_v8"],
-                   ["grep_v9"],["grep_v10"],["grep_v11"],["grep_v12"],["grep_v13"],["grep_v14"],["grep_v15"],["grep_v16"],
-                   ["grep_v17"],["grep_v18"],["grep_v19"],["grep_v20"],]
+    all_mutants = [["grep_v16"]]
     for alist in all_mutants:
         mutant_rate.execute(1, alist)
     mutant_rate.write_partition_rate()
