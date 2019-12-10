@@ -37,7 +37,7 @@ class rapt(object):
         self.__punishment = [0] * 550
 
         self.__epsilon = 0.05
-        self.__delta = 0.01
+        self.__delta = 0.42
 
     def __initial_boundary(self):
         partition_map = allocation_object.get_partition_map()
@@ -126,7 +126,8 @@ class rapt(object):
                 sum = 0
                 for index in range(0, 551):
                     if index != ex_source_partition:
-                        same_hit_i_shreshold = (1 + math.log(self.__reward[index])) * self.__epsilon / (self.__number_partitions - 1)
+                        same_hit_i_shreshold = (
+                            1 + math.log(self.__reward[index])) * self.__epsilon / (self.__number_partitions - 1)
                         if self.__test_profile[index] > same_hit_i_shreshold:
                             self.__test_profile[index] -= same_hit_i_shreshold
                             sum += self.__test_profile[index]
@@ -140,7 +141,8 @@ class rapt(object):
                 old_s = self.__test_profile[ex_source_partition]
                 old_f = self.__test_profile[ex_follow_partition]
                 sum = 0
-                not_same_hit_i_shreshold = (1 + math.log(self.__reward[ex_source_partition])) * self.__epsilon / (self.__number_partitions - 2)
+                not_same_hit_i_shreshold = (
+                    1 + math.log(self.__reward[ex_source_partition])) * self.__epsilon / (self.__number_partitions - 2)
                 for index in range(0, 551):
                     if index != ex_source_partition and index != ex_follow_partition:
                         not_same_hit_i_shreshold = (1 + math.log(
@@ -201,12 +203,13 @@ class rapt(object):
                     if i != ex_source_partition and i != ex_follow_partition:
                         self.__test_profile[i] += ((old_s - self.__test_profile[ex_source_partition]) + (
                             old_f - self.__test_profile[ex_follow_partition])) / (self.__number_partitions - 2)
-            if  self.__punishment[ex_source_partition] == self.__boundary[ex_source_partition]:
+            if self.__punishment[ex_source_partition] == self.__boundary[ex_source_partition]:
                 self.__punishment[ex_source_partition] = 0
             elif self.__punishment[ex_follow_partition] == self.__boundary[ex_follow_partition]:
                 self.__punishment[ex_follow_partition] = 0
             else:
                 pass
+
+
 if __name__ == '__main__':
     apt = rapt()
-

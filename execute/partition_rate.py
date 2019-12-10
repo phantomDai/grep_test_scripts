@@ -118,10 +118,11 @@ class partition_failure_rate(object):
                     if isKilledMutant:
                         if str(test_case_index) not in killed_test_case_indexs:
                             killed_test_case_indexs.append(str(test_case_index))
-                        killed_mutanmts.append(mutant_name)
+                        if mutant_name not in killed_mutanmts:
+                            killed_mutanmts.append(mutant_name)
                     else:
                         continue
-        partition_info += "enable killed mutants: " + ','.join(ele for ele in killed_test_case_indexs) + ";"
+        partition_info += "; enable killed mutants: " + ','.join(ele for ele in killed_test_case_indexs) + ";"
         partition_info += "killed mutants: " + ','.join(ele for ele in killed_mutanmts) + ";"
         partition_info += "partition failure rate: " + str(len(killed_test_case_indexs) / len(random_list))
         self.partition_rate.append(partition_info + '\n')
@@ -136,7 +137,7 @@ class partition_failure_rate(object):
 if __name__ == '__main__':
     mt = partition_failure_rate()
     partition_map = allocation_object.get_partition_map()
-    for index in range(2, 551):
+    for index in range(1, 551):
         mt.execute(1, index, partition_map[index])
     mt.write_partition_rate()
 
