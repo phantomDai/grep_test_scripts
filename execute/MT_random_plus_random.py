@@ -5,6 +5,8 @@
 """
 传统的蜕变测试技术：随机选择测试用例随机选择蜕变关系
 """
+
+
 from myutl.Utl import Utl
 from measure.F_time import Ftime
 from measure.F2_time import F2time
@@ -17,16 +19,18 @@ import time
 import os
 import linecache
 
+
 class MT_random_random(object):
 
-    test_cases_2_mrs_path = os.path.join(os.path.abspath('..'), 'mapping relation', 'testcase_2_MRs')
+    test_cases_2_mrs_path = os.path.join(os.path.abspath(
+        '..'), 'mapping relation', 'testcase_2_MRs')
 
-    #获得测试用例的具体信息，索引是行号
+    # 获得测试用例的具体信息，索引是行号
     test_cases = []
 
     wrong_test_cases = []
 
-    #获取测试用例与蜕变关系的映射关系,键是测试用例的编号，值是可以作用的蜕变关系列表
+    # 获取测试用例与蜕变关系的映射关系,键是测试用例的编号，值是可以作用的蜕变关系列表
     test_case_2_MRs = {}
 
     # 执行测试用例的工具类
@@ -43,7 +47,6 @@ class MT_random_random(object):
 
     #　Ｆ２标准的记录者
     F2_measure_recorder = F2()
-
 
     def __init__(self):
         """
@@ -62,9 +65,8 @@ class MT_random_random(object):
 
         self.wrong_test_cases = self.exec_utl.get_wrong_patterns()
         # mutant names
-        mutant_names_list = ['grep_v1', 'grep_v2', 'grep_v3', 'grep_v4', 'grep_v5', 'grep_v6', 'grep_v7', 'grep_v8',
-                             'grep_v9', 'grep_v10', 'grep_v11', 'grep_v12', 'grep_v13', 'grep_v14', 'grep_v15', 'grep_v16',
-                             'grep_v17', 'grep_v18', 'grep_v19', 'grep_v20']
+        mutant_names_list = ['grep_v2', 'grep_v4', 'grep_v6',
+                             'grep_v13', 'grep_v15', 'grep_v17', 'grep_v18', 'grep_v19']
 
         F_select_time = int(0)
         F_generate_time = int(0)
@@ -81,7 +83,7 @@ class MT_random_random(object):
         num_killed_mutants = int(0)
 
         started_selecting_all_time = int(round(time.time() * 1000))
-        #获取由指定种子产生的一系列随机值，作为选择的测试用例的编号
+        # 获取由指定种子产生的一系列随机值，作为选择的测试用例的编号
         random_list = self.exec_utl.generate_random_number(seed)
         ended_selecting_all_time = int(round(time.time() * 1000))
 
@@ -91,7 +93,7 @@ class MT_random_random(object):
         # 统计测试用例的执行数目
         num_test_case_counter = int(0)
 
-        #开始遍历测试用例
+        # 开始遍历测试用例
         for test_case_index in random_list:
 
             num_test_case_counter += 1
@@ -105,26 +107,28 @@ class MT_random_random(object):
             source_pattern = self.test_cases[test_case_index]
 
             # 统计测试用来的生成时间
-            started_generating_follow_test_case_time = int(round(time.time() * 1000))
+            started_generating_follow_test_case_time = int(
+                round(time.time() * 1000))
 
             # 获取该正则表达式可以作用的蜕变关系的集合，然后随机选择一个蜕变关系
             # MRs = self.exec_utl.get_test_case_MR_list(test_case_index)
             MRs = linecache.getline(self.test_cases_2_mrs_path, test_case_index).\
-                replace('\'', '').replace('\'', '').strip().split(':')[1].replace('[', '').replace(']', '')
+                replace('\'', '').replace('\'', '').strip().split(
+                    ':')[1].replace('[', '').replace(']', '')
             MRs_list = MRs.split(', ')
-            #randomly select a MR
+            # randomly select a MR
             selected_MR = self.exec_utl.random_select_MR(MRs_list)
-            if selected_MR == 'MR9':
-                continue
 
             # 获取衍生测试用例
             follow_pattern = self.exec_utl.generate_follow_test_case(selected_MR,
                                                                      source_pattern, test_case_index)
 
-            ended_generating_follow_test_case_time = int(round(time.time() * 1000))
+            ended_generating_follow_test_case_time = int(
+                round(time.time() * 1000))
 
             # 生成衍生测试用例的时间
-            generate_follow_test_case_time = ended_generating_follow_test_case_time - started_generating_follow_test_case_time
+            generate_follow_test_case_time = ended_generating_follow_test_case_time - \
+                started_generating_follow_test_case_time
 
             # record test case generating time
             if num_killed_mutants == 0:
@@ -134,34 +138,39 @@ class MT_random_random(object):
 
             # 遍历变异体
             for mutant_name in mutant_names_list:
-                temp_a = len(mutant_names_list)
                 source_command = ''
                 follow_command = ''
 
                 if selected_MR != 'MR11' and selected_MR != 'MR9':
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                          + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
-                          + "/" + str(num_test_case_counter) + "_source_" + mutant_name
+                        + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
+                          + "/" + str(num_test_case_counter) + \
+                        "_source_" + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                          + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
-                          + "/" + str(num_test_case_counter) + "_follow_" + mutant_name
+                        + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
+                        + "/" + str(num_test_case_counter) + \
+                        "_follow_" + mutant_name
                 elif selected_MR == 'MR11':
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                              + "\" " + "../targetFiles/MR11_" + str(test_case_index) + ">> ../testingResults/repetitive" \
-                              + str(seed) + "/" + str(num_test_case_counter) + '_source_' + mutant_name
+                        + "\" " + "../targetFiles/MR11_" + str(test_case_index) + "> ../testingResults/repetitive" \
+                        + str(seed) + "/" + str(num_test_case_counter) + \
+                        '_source_' + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                              + "\" " + "../targetFiles/MR11_" + str(test_case_index) + ">> ../testingResults/repetitive" \
-                              + str(seed) + "/" + str(num_test_case_counter) + '_follow_' + mutant_name
+                        + "\" " + "../targetFiles/MR11_" + str(test_case_index) + "> ../testingResults/repetitive" \
+                        + str(seed) + "/" + str(num_test_case_counter) + \
+                        '_follow_' + mutant_name
                 else:
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
-                                     + "/" + str(num_test_case_counter) + "_source_" + mutant_name
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
+                                     + "/" + str(num_test_case_counter) + \
+                        "_source_" + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                                     + "\" " + "../targetFiles/file.test_MR9_follow >> ../testingResults/repetitive" + str(seed) \
-                                     + "/" + str(num_test_case_counter) + "_follow_" + mutant_name
+                                     + "\" " + "../targetFiles/file.test_MR9_follow > ../testingResults/repetitive" + str(seed) \
+                                     + "/" + str(num_test_case_counter) + \
+                        "_follow_" + mutant_name
 
                 # executing source and follow-up test cases
                 started_executing_cases_time = int(round(time.time() * 1000))
@@ -177,22 +186,23 @@ class MT_random_random(object):
                     F_execute_time += execute_test_cases_time
                 else:
                     F2_execute_time += execute_test_cases_time
-                # 让程序休眠１s
-                time.sleep(0.1)
 
                 # 标志位：判断测试用例是否揭示故障，默认没有揭示故障
                 isKilledMutant = False
                 # 调用ＭＲ的验证结果的方法，判断是否揭示故障
                 if selected_MR != 'MR11':
-                    isKilledMutant = self.exec_utl.verify_result_not_MR11(selected_MR, str(seed), str(num_test_case_counter), mutant_name)
+                    isKilledMutant = self.exec_utl.verify_result_not_MR11(
+                        selected_MR, str(seed), str(num_test_case_counter), mutant_name)
                 else:
-                    isKilledMutant = self.exec_utl.verify_result_MR11(str(seed), str(num_test_case_counter), str(test_case_index), mutant_name)
+                    isKilledMutant = self.exec_utl.verify_result_MR11(str(seed), str(
+                        num_test_case_counter), str(test_case_index), mutant_name)
 
                 # 判断是否揭示故障
                 if isKilledMutant:
                     print("killed a mutant: repetitive:" + str(seed) + "; mutant_name: " + mutant_name
-                          + "; selected_MR: " + selected_MR + "; testing_index:" + str(num_test_case_counter)
-                                            + "; test_case_index:" + str(test_case_index))
+                          + "; selected_MR: " + selected_MR +
+                          "; testing_index:" + str(num_test_case_counter)
+                          + "; test_case_index:" + str(test_case_index))
 
                     mutant_names_list.remove(mutant_name)
                     num_killed_mutants += 1
@@ -213,15 +223,12 @@ class MT_random_random(object):
                     continue
 
             if num_killed_mutants == 2:
-               break
+                break
 
         # record testing informtion
         self.record_result_info(F, F2)
         self.record_time_info(F_select_time, F_generate_time, F_execute_time,
                               F2_select_time, F2_generate_time, F2_execute_time)
-
-
-
 
     def record_result_info(self, f_mesure, f2_mesure):
         """
@@ -235,7 +242,7 @@ class MT_random_random(object):
 
     def record_time_info(self, f_select, f_generte, f_execute, f2_select, f2_generte, f2_execute):
         """
-        
+
         :param f_select: f标准选择测试用例的时间
         :param f_generte: f标准选择测试用例的时间
         :param f_execute: f标准选择测试用例的时间
@@ -253,27 +260,33 @@ class MT_random_random(object):
 
     def write_results_time_info(self):
         content = []
-        content.append("F-average: " + str(self.F_measure_recorder.get_average()) + '\n')
-        content.append("F2-average: " + str(self.F2_measure_recorder.get_average()) + '\n')
-        content.append("F-variance: " + str(self.F_measure_recorder.get_variance()) + '\n')
-        content.append("F2-variance: " + str(self.F2_measure_recorder.get_variance()) + '\n')
+        content.append("F-average: " +
+                       str(self.F_measure_recorder.get_average()) + '\n')
+        content.append("F2-average: " +
+                       str(self.F2_measure_recorder.get_average()) + '\n')
+        content.append("F-variance: " +
+                       str(self.F_measure_recorder.get_variance()) + '\n')
+        content.append("F2-variance: " +
+                       str(self.F2_measure_recorder.get_variance()) + '\n')
         content.append("F-select-average: " + str(self.F_time_recorder.get_F_select_average())
-                       + ";F-generate-average: " + str(self.F_time_recorder.get_F_generate_average())
+                       + ";F-generate-average: " +
+                       str(self.F_time_recorder.get_F_generate_average())
                        + ";F-execute-average: " + str(self.F_time_recorder.get_F_execute_average()) + '\n')
 
         content.append("F-select-variance: " + str(self.F_time_recorder.get_F_select_variance())
-                       + ";F-generate-variance: " + str(self.F_time_recorder.get_F_generate_variance())
+                       + ";F-generate-variance: " +
+                       str(self.F_time_recorder.get_F_generate_variance())
                        + ";F-execute-variance: " + str(self.F_time_recorder.get_F_execute_variance()) + '\n')
 
         content.append("F2-select-average: " + str(self.F2_time_recorder.get_F2_select_average())
-                       + ";F2-generate-average: " + str(self.F2_time_recorder.get_F2_generate_average())
+                       + ";F2-generate-average: " +
+                       str(self.F2_time_recorder.get_F2_generate_average())
                        + ";F2-execute-average: " + str(self.F2_time_recorder.get_F2_execute_average()) + '\n')
 
         content.append("F2-select-variance: " + str(self.F2_time_recorder.get_F2_select_variance())
-                       + ";F2-generate-variance: " + str(self.F2_time_recorder.get_F2_generate_variance())
+                       + ";F2-generate-variance: " +
+                       str(self.F2_time_recorder.get_F2_generate_variance())
                        + ";F2-execute-variance: " + str(self.F2_time_recorder.get_F2_execute_variance()) + '\n')
-
-
 
         parent_path = os.path.join(os.getcwd(), 'test_results')
 
@@ -286,9 +299,9 @@ class MT_random_random(object):
                           self.F_measure_recorder.get_all_F(),
                           self.F2_measure_recorder.get_all_F2(), self.F_time_recorder.get_all_F_select(),
                           self.F_time_recorder.get_all_F_generate(), self.F_time_recorder.get_all_F_execute(),
-                          self.F2_time_recorder.get_F2_all_select(), self.F2_time_recorder.get_F2_all_generate(),
-                          self.F2_time_recorder.get_F2_all_execute())
-
+                          self.F2_time_recorder.get_F2_all_select(
+        ), self.F2_time_recorder.get_F2_all_generate(),
+            self.F2_time_recorder.get_F2_all_execute())
 
     def get_all_average_list(self):
         all_average = [0] * 8
@@ -320,27 +333,3 @@ if __name__ == '__main__':
     for seed in range(1, 31):
         mt.execute(seed)
     mt.write_results_time_info()
-
-
-
-
-
-
-            
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
