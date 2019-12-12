@@ -82,10 +82,10 @@ class MT_random_random(object):
         # the number of killed mutants
         num_killed_mutants = int(0)
 
-        started_selecting_all_time = int(round(time.time() * 1000))
+        started_selecting_all_time = int(round(time.time() * 1000000))
         # 获取由指定种子产生的一系列随机值，作为选择的测试用例的编号
         random_list = self.exec_utl.generate_random_number(seed)
-        ended_selecting_all_time = int(round(time.time() * 1000))
+        ended_selecting_all_time = int(round(time.time() * 1000000))
 
         # 选择测试用例需要的总时间
         selecting_all_test_cases_time = ended_selecting_all_time - started_selecting_all_time
@@ -108,7 +108,7 @@ class MT_random_random(object):
 
             # 统计测试用来的生成时间
             started_generating_follow_test_case_time = int(
-                round(time.time() * 1000))
+                round(time.time() * 1000000))
 
             # 获取该正则表达式可以作用的蜕变关系的集合，然后随机选择一个蜕变关系
             # MRs = self.exec_utl.get_test_case_MR_list(test_case_index)
@@ -124,7 +124,7 @@ class MT_random_random(object):
                                                                      source_pattern, test_case_index)
 
             ended_generating_follow_test_case_time = int(
-                round(time.time() * 1000))
+                round(time.time() * 1000000))
 
             # 生成衍生测试用例的时间
             generate_follow_test_case_time = ended_generating_follow_test_case_time - \
@@ -173,12 +173,12 @@ class MT_random_random(object):
                         "_follow_" + mutant_name
 
                 # executing source and follow-up test cases
-                started_executing_cases_time = int(round(time.time() * 1000))
+                started_executing_cases_time = int(round(time.time() * 1000000))
                 terminal_source = os.popen(source_command)
                 terminal_source.close()
                 terminal_follow = os.popen(follow_command)
                 terminal_follow.close()
-                ended_executing_cases_time = int(round(time.time() * 1000))
+                ended_executing_cases_time = int(round(time.time() * 1000000))
                 execute_test_cases_time = ended_executing_cases_time - started_executing_cases_time
 
                 # record source and follow-up test cases executing time
@@ -207,14 +207,13 @@ class MT_random_random(object):
                     mutant_names_list.remove(mutant_name)
                     num_killed_mutants += 1
                     if num_killed_mutants == 1:
-
                         F = num_test_case_counter * 2
-                        F_select_time = selecting_all_test_cases_time / 1000000 * F
+                        F_select_time = selecting_all_test_cases_time / 1000000 * (F / 2)
                         break
 
                     elif num_killed_mutants == 2:
                         F2 = num_test_case_counter * 2 - F
-                        F2_select_time = selecting_all_test_cases_time / 1000000 * F2
+                        F2_select_time = selecting_all_test_cases_time / 1000000 * (F2 / 2)
                         break
                     else:
                         break

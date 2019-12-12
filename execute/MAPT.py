@@ -13,7 +13,7 @@ class mapt(object):
     def __init__(self):
         self.__number_partitions = 550
         self.__test_profile = [
-            [1 / self.__number_partitions for i in range(0, 551)]] * 550
+            [1 / self.__number_partitions for i in range(0, 550)]] * 550
 
         self.__mapt_gamma = 0.1
         self.__mapt_tau = 0.1
@@ -48,7 +48,8 @@ class mapt(object):
         ex_source_partition -= 1
         if ex_follow_partition is None:
             ex_follow_partition = ex_source_partition
-        ex_follow_partition -= 1
+        else:
+            ex_follow_partition -= 1
 
         old_i = self.__test_profile[ex_source_partition][ex_source_partition]
         old_f = self.__test_profile[ex_follow_partition][ex_follow_partition]

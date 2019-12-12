@@ -183,8 +183,12 @@ class execute_utl(object):
             return ex_source_partition
         else:
             # 去掉测试帧中的"#"
-            temp_list = [ele if ele != '#' else '' for ele in follow_test_frame.split(
-            )]
+            temp_list = []
+            for ele in follow_test_frame.split(';'):
+                if ele != '#' and ele != '':
+                    temp_list.append(ele)
+                else:
+                    pass
             follow_test_frame = ';'.join(ele for ele in temp_list)
             follow_set = set(ele for ele in temp_list)
             # 判断衍生测试用例所在的分区
@@ -201,6 +205,7 @@ class execute_utl(object):
         :param MR_list: condicate MRs
         :return: MR
         """
+        return MR_list[random.randint(0, len(MR_list) - 1)]
         list2 = []
         list3 = []
         list1 = []

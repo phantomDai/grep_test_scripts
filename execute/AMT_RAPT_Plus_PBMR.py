@@ -62,7 +62,8 @@ class AMT_RAPT_PBMR(object):
         """
 
         # mutant names
-        mutant_names_list = constant.mutant_names_list
+        mutant_names_list = ['grep_v2', 'grep_v4', 'grep_v6',
+                             'grep_v13', 'grep_v15', 'grep_v17', 'grep_v18', 'grep_v19']
 
         # 初始化度量标准
         F_select_time = int(0)
@@ -98,14 +99,14 @@ class AMT_RAPT_PBMR(object):
             # 测试用例的编号
             test_case_index = 0
 
-            #　记录选择测试用例需要的时间
+            # 　记录选择测试用例需要的时间
             started_select_source_test_case_time = int(
                 round(time.time() * 1000000))
 
             # 选择一个分区
             partition_index = 0
             if num_test_case_counter == 1:
-                partition_index = random.randint(0, 551)
+                partition_index = random.randint(1, 550)
                 ex_source_partition = partition_index
                 ex_follow_partition = partition_index
             else:
@@ -148,13 +149,11 @@ class AMT_RAPT_PBMR(object):
             # 获取该正则表达式可以作用的蜕变关系的集合，然后随机选择一个蜕变关系
             MRs = linecache.getline(constant.test_cases_2_mrs_path, test_case_index). \
                 replace('\'', '').replace('\'', '').strip().split(
-                    ':')[1].replace('[', '').replace(']', '')
+                ':')[1].replace('[', '').replace(']', '')
             MRs_list = MRs.split(', ')
 
             # randomly select a MR
             selected_MR = self.__exec_utl.PBMR_select_MR(MRs_list)
-            if selected_MR == 'MR9':
-                continue
 
             # 获取衍生测试用例
             follow_pattern = self.__exec_utl.generate_follow_test_case(
@@ -165,7 +164,7 @@ class AMT_RAPT_PBMR(object):
 
             # 生成衍生测试用例的时间
             generate_follow_test_case_time = ended_generating_follow_test_case_time - \
-                started_generating_follow_test_case_time
+                                             started_generating_follow_test_case_time
 
             # 判断衍生测试用例所在的分区
             ex_follow_partition = self.__exec_utl.get_follow_test_case_partition(
@@ -183,37 +182,37 @@ class AMT_RAPT_PBMR(object):
 
                 if selected_MR != 'MR11' and selected_MR != 'MR9':
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
                                      + "/" + str(num_test_case_counter) + \
-                        "_source_" + mutant_name
+                                     "_source_" + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
                                      + "/" + str(num_test_case_counter) + \
-                        "_follow_" + mutant_name
+                                     "_follow_" + mutant_name
                 elif selected_MR == 'MR11':
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
                                      + "\" " + "../targetFiles/MR11_" + str(
-                                         test_case_index) + ">> ../testingResults/repetitive" \
-                        + str(seed) + "/" + str(num_test_case_counter) + \
-                        '_source_' + mutant_name
+                        test_case_index) + "> ../testingResults/repetitive" \
+                                     + str(seed) + "/" + str(num_test_case_counter) + \
+                                     '_source_' + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
                                      + "\" " + "../targetFiles/MR11_" + str(
-                                         test_case_index) + ">> ../testingResults/repetitive" \
-                        + str(seed) + "/" + str(num_test_case_counter) + \
-                        '_follow_' + mutant_name
+                        test_case_index) + "> ../testingResults/repetitive" \
+                                     + str(seed) + "/" + str(num_test_case_counter) + \
+                                     '_follow_' + mutant_name
                 else:
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
                                      + "/" + str(num_test_case_counter) + \
-                        "_source_" + mutant_name
+                                     "_source_" + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                                     + "\" " + "../targetFiles/file.test_MR9_follow >> ../testingResults/repetitive" + str(
-                                         seed) \
-                        + "/" + str(num_test_case_counter) + \
-                        "_follow_" + mutant_name
+                                     + "\" " + "../targetFiles/file.test_MR9_follow > ../testingResults/repetitive" + str(
+                        seed) \
+                                     + "/" + str(num_test_case_counter) + \
+                                     "_follow_" + mutant_name
 
                 # executing source and follow-up test cases
                 started_executing_cases_time = int(
@@ -230,8 +229,6 @@ class AMT_RAPT_PBMR(object):
                     F_execute_time += execute_test_cases_time
                 else:
                     F2_execute_time += execute_test_cases_time
-                # 让程序休眠１s
-                time.sleep(0.1)
 
                 # 调用ＭＲ的验证结果的方法，判断是否揭示故障
                 if selected_MR != 'MR11':
@@ -262,7 +259,6 @@ class AMT_RAPT_PBMR(object):
                     if num_killed_mutants == 1:
                         F = num_test_case_counter * 2
                         break
-
                     elif num_killed_mutants == 2:
                         F2 = num_test_case_counter * 2 - F
                         break
@@ -273,8 +269,7 @@ class AMT_RAPT_PBMR(object):
                     self.__rapt.add_punishement(ex_source_partition, ex_follow_partition)
 
                 # 调整测试剖面
-                self.__rapt.adjust_profile(
-                    ex_source_partition, ex_follow_partition, isKilledMutant)
+                self.__rapt.adjust_profile(ex_source_partition, ex_follow_partition, isKilledMutant)
 
             if num_killed_mutants == 2:
                 break
@@ -344,7 +339,7 @@ class AMT_RAPT_PBMR(object):
 
         parent_path = os.path.join(os.getcwd(), 'test_results')
 
-        file_path = os.path.join(parent_path, 'AMT_RAPT_random')
+        file_path = os.path.join(parent_path, 'AMT_RAPT_PBMR')
         file = open(file_path, 'w+')
         file.writelines(content)
         file.close()

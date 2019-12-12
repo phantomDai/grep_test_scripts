@@ -62,7 +62,8 @@ class AMT_MAPT_PBMR(object):
         """
 
         # mutant names
-        mutant_names_list = constant.mutant_names_list
+        mutant_names_list = ['grep_v2', 'grep_v4', 'grep_v6',
+                             'grep_v13', 'grep_v15', 'grep_v17', 'grep_v18', 'grep_v19']
 
         # 初始化度量标准
         F_select_time = int(0)
@@ -148,8 +149,6 @@ class AMT_MAPT_PBMR(object):
 
             # randomly select a MR
             selected_MR = self.__exec_utl.PBMR_select_MR(MRs_list)
-            if selected_MR == 'MR9':
-                continue
 
             # 获取衍生测试用例
             follow_pattern = self.__exec_utl.generate_follow_test_case(
@@ -177,34 +176,34 @@ class AMT_MAPT_PBMR(object):
 
                 if selected_MR != 'MR11' and selected_MR != 'MR9':
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
                                      + "/" + str(num_test_case_counter) + \
                         "_source_" + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
                                      + "/" + str(num_test_case_counter) + \
                         "_follow_" + mutant_name
                 elif selected_MR == 'MR11':
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
                                      + "\" " + "../targetFiles/MR11_" + str(
-                                         test_case_index) + ">> ../testingResults/repetitive" \
+                                         test_case_index) + "> ../testingResults/repetitive" \
                         + str(seed) + "/" + str(num_test_case_counter) + \
                         '_source_' + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
                                      + "\" " + "../targetFiles/MR11_" + str(
-                                         test_case_index) + ">> ../testingResults/repetitive" \
+                                         test_case_index) + "> ../testingResults/repetitive" \
                         + str(seed) + "/" + str(num_test_case_counter) + \
                         '_follow_' + mutant_name
                 else:
                     source_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + source_pattern \
-                                     + "\" " + "../targetFiles/file.test >> ../testingResults/repetitive" + str(seed) \
+                                     + "\" " + "../targetFiles/file.test > ../testingResults/repetitive" + str(seed) \
                                      + "/" + str(num_test_case_counter) + \
                         "_source_" + mutant_name
 
                     follow_command = r"../Mutants/" + mutant_name + "/bin/grep -E " + "\"" + follow_pattern \
-                                     + "\" " + "../targetFiles/file.test_MR9_follow >> ../testingResults/repetitive" + str(
+                                     + "\" " + "../targetFiles/file.test_MR9_follow > ../testingResults/repetitive" + str(
                                          seed) \
                         + "/" + str(num_test_case_counter) + \
                         "_follow_" + mutant_name
@@ -224,8 +223,6 @@ class AMT_MAPT_PBMR(object):
                     F_execute_time += execute_test_cases_time
                 else:
                     F2_execute_time += execute_test_cases_time
-                # 让程序休眠１s
-                time.sleep(0.1)
 
                 # 标志位：判断测试用例是否揭示故障，默认没有揭示故障
                 isKilledMutant = False
@@ -330,7 +327,7 @@ class AMT_MAPT_PBMR(object):
 
         parent_path = os.path.join(os.getcwd(), 'test_results')
 
-        file_path = os.path.join(parent_path, 'AMT_MAPT_random')
+        file_path = os.path.join(parent_path, 'AMT_MAPT_PBMR')
         file = open(file_path, 'w+')
         file.writelines(content)
         file.close()

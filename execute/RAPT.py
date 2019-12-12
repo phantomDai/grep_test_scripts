@@ -22,7 +22,7 @@ class rapt(object):
         initial varians
         """
         # test profile
-        self.__test_profile = [1 / 550 for i in range(0, 551)]
+        self.__test_profile = [1 / 550 for i in range(0, 550)]
 
         # number of partitions
         self.__number_partitions = 550
@@ -42,8 +42,8 @@ class rapt(object):
     def __initial_boundary(self):
         partition_map = allocation_object.get_partition_map()
         boundaries = [0] * 550
-        for index in range(1, 551):
-            boundaries[index - 1] = int(len(partition_map[index]) * 0.7)
+        for index in range(0, 550):
+            boundaries[index] = int(len(partition_map[index + 1]) * 0.7)
         return boundaries
 
     def get_next_partition_index(self):
@@ -74,11 +74,15 @@ class rapt(object):
         else:
             follow_partition_index -= 1
 
+        c = self.__punishment
+        a = self.__punishment[source_partition_index]
+        b = self.__punishment[follow_partition_index]
+
         if source_partition_index == follow_partition_index:
-            self.__test_profile[source_partition_index] += 1
+            self.__punishment[source_partition_index] += 1
         else:
-            self.__test_profile[source_partition_index] += 1
-            self.__test_profile[follow_partition_index] += 1
+            self.__punishment[source_partition_index] += 1
+            self.__punishment[follow_partition_index] += 1
 
     def add_reward(self, source_partition_index, follow_partition_index):
         """
@@ -87,11 +91,16 @@ class rapt(object):
         :param follow_partition_index:
         :return:
         """
-        if source_partition_index == follow_partition_index:
-            self.__reward[int(source_partition_index) - 1] += 1
+        source_partition_index -= 1
+        if follow_partition_index is None:
+            follow_partition_index = source_partition_index
         else:
-            self.__reward[int(source_partition_index) - 1] += 1
-            self.__reward[int(follow_partition_index) - 1] += 1
+            follow_partition_index -= 1
+        if source_partition_index == follow_partition_index:
+            self.__reward[int(source_partition_index)] += 1
+        else:
+            self.__reward[int(source_partition_index)] += 1
+            self.__reward[int(follow_partition_index)] += 1
 
     def clear_punishement(self, source_partition_index, follow_partition_index):
         """
@@ -100,11 +109,17 @@ class rapt(object):
         :param follow_partition_index:
         :return:
         """
-        if source_partition_index == follow_partition_index:
-            self.__punishment[source_partition_index - 1] = 0
+        source_partition_index -= 1
+        if follow_partition_index is None:
+            follow_partition_index = source_partition_index
         else:
-            self.__punishment[source_partition_index - 1] = 0
-            self.__punishment[follow_partition_index - 1] = 0
+            follow_partition_index -= 1
+
+        if source_partition_index == follow_partition_index:
+            self.__punishment[source_partition_index] = 0
+        else:
+            self.__punishment[source_partition_index] = 0
+            self.__punishment[follow_partition_index] = 0
 
     def adjust_profile(self, ex_source_partition, ex_follow_partition, isKilledMutant):
         """
@@ -114,6 +129,7 @@ class rapt(object):
         :param isKilledMutant:
         :return:
         """
+
         ex_source_partition -= 1
         if ex_follow_partition is None:
             ex_follow_partition = ex_source_partition
@@ -124,7 +140,7 @@ class rapt(object):
             if ex_source_partition == ex_follow_partition:  # source and follow-up test cases belong to same partition
 
                 sum = 0
-                for index in range(0, 551):
+                for index in range(0, 550):
                     if index != ex_source_partition:
                         same_hit_i_shreshold = (
                             1 + math.log(self.__reward[index])) * self.__epsilon / (self.__number_partitions - 1)
@@ -143,7 +159,7 @@ class rapt(object):
                 sum = 0
                 not_same_hit_i_shreshold = (
                     1 + math.log(self.__reward[ex_source_partition])) * self.__epsilon / (self.__number_partitions - 2)
-                for index in range(0, 551):
+                for index in range(0, 550):
                     if index != ex_source_partition and index != ex_follow_partition:
                         not_same_hit_i_shreshold = (1 + math.log(
                             self.__reward[index])) * self.__epsilon / (self.__number_partitions - 2)
@@ -164,11 +180,11 @@ class rapt(object):
             self.__reward[ex_source_partition] = 0
             self.__reward[ex_follow_partition] = 0
         else:  # does not detect a fault
-            old_s = self.__test_profile[ex_source_partition]
-            old_f = self.__test_profile[ex_follow_partition]
+            old_s = self.__test_profile[int(ex_source_partition)]
+            old_f = self.__test_profile[int(ex_follow_partition)]
             # source test case and follow test case belong to same partition
             if ex_source_partition == ex_follow_partition:
-                for index in range(0, 551):
+                for index in range(0, 550):
                     if index == ex_source_partition:
                         if self.__test_profile[ex_source_partition] > self.__delta:
                             self.__test_profile[ex_source_partition] -= self.__delta
@@ -199,7 +215,7 @@ class rapt(object):
                     self.__test_profile[ex_follow_partition] = 0
                 else:
                     pass
-                for i in range(0, 551):
+                for i in range(0, 550):
                     if i != ex_source_partition and i != ex_follow_partition:
                         self.__test_profile[i] += ((old_s - self.__test_profile[ex_source_partition]) + (
                             old_f - self.__test_profile[ex_follow_partition])) / (self.__number_partitions - 2)
@@ -213,3 +229,4 @@ class rapt(object):
 
 if __name__ == '__main__':
     apt = rapt()
+
